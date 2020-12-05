@@ -1,7 +1,7 @@
 class Shops {
   static shops = [
     {
-      name: "Game",
+      name: "Game.es",
       productUrl:
         "https://www.game.es/HARDWARE/CONSOLA/PLAYSTATION-5/CONSOLA-PLAYSTATION-5/183224",
       selectors: {
@@ -18,12 +18,12 @@ class Shops {
       },
     },
     {
-      name: "fnac.es",
+      name: "pccomponentes.com",
       productUrl:
-        "https://www.fnac.es/Mando-inalambrico-DualSense-para-PS5-Blanco-Accesorio-Videoconsola-Mando-consola/a7724804#omnsearchpos=4",
+        "https://www.pccomponentes.com/sony-playstation-5",
       selectors: {
-        state: "f-buyBox-availabilityStatus-available",
-        price: "f-productOffer-priceBox",
+        state: "#articleOutOfStock > div.col-xs-12.col-sm-9",
+        price: "#precio-main",
       },
     },
   ];

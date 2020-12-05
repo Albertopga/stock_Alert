@@ -5,8 +5,7 @@ class Browser {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.goto(url);
-    console.log("Browser configured");
-    return page;
+    return { page, browser };
   }
 }
 module.exports = Browser;

@@ -1,7 +1,8 @@
 const nodemailer = require("nodemailer");
+const fs = require("fs");
 
 const user = "senderlearnmails@gmail.com";
-const pass = "Vf$fZSmLFd3";
+const pass = "Vf$fZSmLFd3#";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -12,22 +13,35 @@ const transporter = nodemailer.createTransport({
 });
 
 class Mailer {
-  static mailOptions = {
-    from: '"Stock Tracker" <senderlearnmails@gmail.com>',
-    to: "albertopga@gmail.com",
-    subject: "Product in stock",
-    text: "The product you are waiting for are in stock",
-    html: `<a href=\"${URL}\">Link</a>`,
-  };
+  constructor(html) {
+    console.log("hola");
+    this.options = {
+      from: '"Stock Tracker" <senderlearnmails@gmail.com>',
+      to: "",
+      subject: "Product in stock",
+      text: "The product you are waiting for are in stock",
+      html: html,
+    };
+  }
 
-  static sendMail = (mailOptions) => {
-    transporter.sendMail(mailOptions, function (error, info) {
+  sendMail = (to) => {
+    this.options.to = to;
+    transporter.sendMail(this.options, function (error, info) {
       if (error) {
-        console.log(error);
+        console.log({ error });
       } else {
         console.log("Email sent: " + info.response);
       }
     });
+  };
+
+  getMails = () => {
+    try {
+      let data = fs.readFileSync("./utils/usersMail.txt", "utf8");
+      return data.replace("\r", ",").replace("\n", " ");
+    } catch (e) {
+      console.log(e);
+    }
   };
 }
 
