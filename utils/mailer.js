@@ -14,7 +14,6 @@ const transporter = nodemailer.createTransport({
 
 class Mailer {
   constructor(html) {
-    console.log("hola");
     this.options = {
       from: '"Stock Tracker" <senderlearnmails@gmail.com>',
       to: "",

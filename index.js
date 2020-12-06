@@ -12,41 +12,57 @@ async function monitor() {
   for (const shop of Shops.shops) {
     const { page, browser } = await Browser.configBrowse(shop.productUrl);
     const result = await checkStock(page, shop.selectors, shop.name);
-    //updateLog(result);
     if (result.state) results.push(result);
     await browser.close();
   }
-
   if (results.length > 0) {
-    const mail = new Mailer(results.toString());
-    mail.sendMail(mail.getMails());
+    sendMail(results);
   } else {
-    console.log("No Stock yet");
+    updateLog("No Stock yet");
   }
 }
 
-async function checkStock(page, selectors, shopName) {
-  await page.reload();
-  let html = await page.evaluate(() => document.body.innerHTML);
-  const $ = cheerio.load(html);
-  let result = {
-    shopName: shopName,
-    url: page.target()._targetInfo.url,
-    state: { price: -1, stock: false },
-  };
-  //await page.screenshot({path: `./screenshot/${shopName}-${getDate()}.png`});
+function sendMail(results) {
+  const mail = new Mailer(generateMailHtml(results));
+  mail.sendMail(mail.getMails());
+}
 
-  if ($(selectors.price, html)) {
-    result.state.price = $(selectors.price, html)
-      .children()
-      .text()
-      .replace(/\s/g, "");
-
-    result.state.stock = thereIsStock(
-      $(selectors.state, html).text().trim().toUpperCase()
-    );
+function generateMailHtml(results) {
+  let html = "<h1>Available stock in</h1><ul>";
+  for (const result of results) {
+    html += `<li><p><a href="${result.url}" >${result.shopName}</a>: ${result.state.price}</p></li>`;
   }
-  return result;
+  html += "</ul>";
+  return html;
+}
+
+async function checkStock(page, selectors, shopName) {
+  try {
+    await page.reload();
+    let html = await page.evaluate(() => document.body.innerHTML);
+    const $ = cheerio.load(html);
+    let result = {
+      shopName: shopName,
+      url: page.target()._targetInfo.url,
+      state: { price: -1, stock: false },
+    };
+    //await page.screenshot({path: `./screenshot/${shopName}-${getDate()}.png`});
+
+    if ($(selectors.price, html)) {
+      result.state.price = $(selectors.price, html)
+        .children()
+        .text()
+        .replace(/\s/g, "");
+
+      result.state.stock = thereIsStock(
+        $(selectors.state, html).text().trim().toUpperCase()
+      );
+    }
+    return result;
+  } catch (e) {
+    console.log(`ERROR: ${e}`);
+    updateLog(e);
+  }
 }
 
 const thereIsStock = (state) => {
@@ -68,14 +84,20 @@ const getDate = () => {
 };
 
 const updateLog = (data) => {
-  fs.appendFile(
-    "./log/log.txt",
-    "*" + getDate() + "*" + JSON.stringify(data) + "\n",
-    (err, file) => {
-      if (err) throw err;
-      console.log("Saved!");
-    }
-  );
+  try {
+    fs.appendFile(
+      "./log/log.txt",
+      `* ${getDate()} * ${data}  \n`,
+      (err, file) => {
+        if (err) {
+          console.log(`ERROR: ${err}`);
+          updateLog(err);
+          throw err;
+        }
+        console.log(`Saved!`);
+      }
+    );
+  } catch (e) {}
 };
 
 monitor();
