@@ -4,7 +4,6 @@ const Mailer = require("./utils/mailer");
 
 const fs = require("fs");
 const cheerio = require("cheerio");
-const CronJob = require("cron").CronJob;
 
 const results = [];
 
