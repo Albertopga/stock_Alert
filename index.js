@@ -12,10 +12,12 @@ async function monitor() {
     const { page, browser } = await Browser.configBrowse(shop.productUrl);
     const result = await checkStock(page, shop.selectors, shop.name);
 
+
     if (result.stock) results.push(result);
     await browser.close();
   }
   if (results > 0) {
+
     sendMail(results);
   } else {
     sendMail(results, "No Stock yet");
@@ -31,6 +33,7 @@ function sendMail(results, text="") {
   }else{
     mail = new Mailer(`<h1>${text}</h1>`);
     console.log("No Stock yet")
+
   }
   mail.sendMail(mail.getMails());
 }

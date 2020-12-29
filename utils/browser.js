@@ -8,7 +8,9 @@ class Browser {
       'ignoreHTTPSErrors': true 
     });
     const page = await browser.newPage();
+
     await page.goto(url);    
+
     return { page, browser };
   }
 }
