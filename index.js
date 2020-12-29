@@ -12,18 +12,26 @@ async function monitor() {
   for (const shop of Shops.shops) {
     const { page, browser } = await Browser.configBrowse(shop.productUrl);
     const result = await checkStock(page, shop.selectors, shop.name);
+
     if (result.state) results.push(result);
     await browser.close();
   }
-  if (results.length > 0) {
+  if (res) {
     sendMail(results);
   } else {
+    sendMail(results, "No Stock yet");
     updateLog("No Stock yet");
   }
 }
 
-function sendMail(results) {
-  const mail = new Mailer(generateMailHtml(results));
+function sendMail(results, text="") {
+  let mail
+  if(text === ""){
+    mail = new Mailer(generateMailHtml(results));
+  
+  }else{
+    mail = new Mailer(`<h1>${text}</h1>`);
+  }
   mail.sendMail(mail.getMails());
 }
 
@@ -46,18 +54,21 @@ async function checkStock(page, selectors, shopName) {
       url: page.target()._targetInfo.url,
       state: { price: -1, stock: false },
     };
-    //await page.screenshot({path: `./screenshot/${shopName}-${getDate()}.png`});
+    
+    let stock =thereIsStock(
+      $(selectors.state, html).text().trim().toUpperCase()
+    );
 
-    if ($(selectors.price, html)) {
-      result.state.price = $(selectors.price, html)
+    if(stock){
+      if ($(selectors.price, html)) {
+        result.state.price = $(selectors.price, html)
         .children()
         .text()
-        .replace(/\s/g, "");
-
-      result.state.stock = thereIsStock(
-        $(selectors.state, html).text().trim().toUpperCase()
-      );
+        .replace(/\s/g, "");        
+        result.state.stock = stock
+      }
     }
+
     return result;
   } catch (e) {
     console.log(`ERROR: ${e}`);
@@ -101,11 +112,3 @@ const updateLog = (data) => {
 };
 
 monitor();
-
-// new CronJob(
-//   " 60 * * * *",
-//   function () {
-//     monitor();
-//   },
-//   true
-// );

@@ -13,13 +13,11 @@
   "dependencies": {
     "aws-sdk": "^2.804.0",
     "cheerio": "^1.0.0-rc.3",
+    "nodemailer": "^6.4.16",
     "express": "^4.17.1"
   },
-  "devDependencies": {
-    "cron": "^1.8.2",
-    "nodemailer": "^6.4.16",
+  "devDependencies": {    
     "nodemon": "^2.0.6",
-    "prettier": "^2.2.1",
-   
+    "prettier": "^2.2.1"   
   }
 }
